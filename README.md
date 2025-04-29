@@ -16,32 +16,31 @@ Building Msys with python 3.10 and numpy 2.2
 
 See in INSTALL.md
 
-```INSTALL.md
-OpenMM env install
-```
+1. OpenMM env install
+```sh
 conda create --name openmm-plumed python=3.10
 conda install -c conda-forge openmm
 conda activate openmm-plumed
 ```
 
-For Ubuntu
+2. Installation of dependencies on Ubuntu
 ```sh
 sudo apt install libboost-dev libboost-all-dev
 sudo apt install scons
 sudo apt install sqlite3 libsqlite3-dev
 sudo apt install pybind11-dev
-cd _PATH_INSTALL/
-git clone https://github.com/DEShawResearch/msys.git
+cd _YOUR_MSYS_INSTALL_PATH_/
+git clone https://github.com/phloglucinol/msys_zlilab.git
 ```
 
-Compile the msys
+3. Compile the msys
 ```
 cd msys
 scons -j4
 ```
 
-Download the InChI and  Lpsolve Support
-```
+4. Download the InChI and  Lpsolve Support
+```sh
 cd msys/external/lpsolve
 wget https://downloads.sourceforge.net/project/lpsolve/lpsolve/5.5.2.5/lp_solve_5.5.2.5_source.tar.gz
 tar -zxvf lp_solve_5.5.2.5_source.tar.gz
@@ -51,16 +50,16 @@ cd msys/external/inchi
 unzip INCHI-1-SRC.zip
 ```
 
-Compile the python wrapper of msys
-```
+5. Compile the python wrapper of msys
+```sh
 scons -j8 PYTHONVER=310 -D MSYS_WITH_INCHI=1 -D MSYS_WITH_LPSOLVE=1
 ```
 
-Add PYTHONPATH：
-```
+- Add PYTHONPATH：
+```sh
 echo 'export PYTHONPATH=_PATH_INSTALL/msys/build/lib/python:$PYTHONPATH' >> ~/.bashrc
 ```
-```
+
 
 Old Building Msys
 -----------------
