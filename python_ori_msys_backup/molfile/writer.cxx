@@ -31,7 +31,7 @@ namespace {
         g.ysize = size[1].cast<int>();
         g.zsize = size[2].cast<int>();
 
-        w.write_grid(g, (const float *)PyArray_DATA((PyArrayObject*)data.ptr()));
+        w.write_grid(g, (const float *)PyArray_DATA(data.ptr()));
     }
 }
 

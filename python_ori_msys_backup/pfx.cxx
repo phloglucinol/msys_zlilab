@@ -114,13 +114,13 @@ static PyObject* py_apply(PyObject* pySelf, PyObject* args, PyObject* kwds) {
                 PyArray_DescrFromType(NPY_DOUBLE), 
                 2, 2, NPY_INOUT_ARRAY | NPY_FORCECAST, NULL);
         if (!boxarr) return NULL;
-        if (PyArray_DIM((PyArrayObject*)boxarr,0)!=3 ||
-            PyArray_DIM((PyArrayObject*)boxarr,1)!=3) {
+        if (PyArray_DIM(boxarr,0)!=3 ||
+            PyArray_DIM(boxarr,1)!=3) {
             PyErr_Format(PyExc_ValueError, "box must be 3x3, got %ldx%ld",
-                        PyArray_DIM((PyArrayObject*)boxarr,0), PyArray_DIM((PyArrayObject*)boxarr,1));
+                        PyArray_DIM(boxarr,0), PyArray_DIM(boxarr,1));
             goto error;
         }
-        box = (double*)PyArray_DATA((PyArrayObject*)boxarr);
+        box = (double*)PyArray_DATA(boxarr);
     }
 
     /* pos is nx3 NumPyArray.  Check the type later */
@@ -129,10 +129,10 @@ static PyObject* py_apply(PyObject* pySelf, PyObject* args, PyObject* kwds) {
         Py_XDECREF(boxarr);
         return NULL;
     }
-    if (PyArray_DIM((PyArrayObject*)posarr,0)!=pfx->size() ||
-        PyArray_DIM((PyArrayObject*)posarr,1)!=3) {
+    if (PyArray_DIM(posarr,0)!=pfx->size() ||
+        PyArray_DIM(posarr,1)!=3) {
         PyErr_Format(PyExc_ValueError, "pos must be %ux3, got %ldx%ld",
-                pfx->size(), PyArray_DIM((PyArrayObject*)posobj,0), PyArray_DIM((PyArrayObject*)posobj,1));
+                pfx->size(), PyArray_DIM(posobj,0), PyArray_DIM(posobj,1));
         goto error;
     }
 
@@ -140,23 +140,23 @@ static PyObject* py_apply(PyObject* pySelf, PyObject* args, PyObject* kwds) {
     if (velobj != Py_None) {
         velarr = PyArray_FromAny(velobj, NULL, 2, 2, NPY_INOUT_ARRAY, NULL);
         if (!velarr) goto error;
-        if (PyArray_DIM((PyArrayObject*)velarr,0)!=pfx->size() ||
-            PyArray_DIM((PyArrayObject*)velarr,1)!=3) {
+        if (PyArray_DIM(velarr,0)!=pfx->size() ||
+            PyArray_DIM(velarr,1)!=3) {
             PyErr_Format(PyExc_ValueError, "vel must be %ux3, got %ldx%ld",
-                    pfx->size(), PyArray_DIM((PyArrayObject*)velarr,0), PyArray_DIM((PyArrayObject*)velarr,1));
+                    pfx->size(), PyArray_DIM(velarr,0), PyArray_DIM(velarr,1));
             goto error;
         }
-        if (PyArray_TYPE((PyArrayObject*)velarr) != PyArray_TYPE((PyArrayObject*)posarr)) {
+        if (PyArray_TYPE(velarr) != PyArray_TYPE(posarr)) {
             PyErr_Format(PyExc_ValueError, "vel must have same type as pos");
             goto error;
         }
     }
 
-    switch (PyArray_TYPE((PyArrayObject*)posarr)) {
+    switch (PyArray_TYPE(posarr)) {
         case NPY_FLOAT:
         {
-            float* pos = (float*)PyArray_DATA((PyArrayObject*)posarr);
-            float* vel = velarr ? (float*)PyArray_DATA((PyArrayObject*)velarr) : NULL;
+            float* pos = (float*)PyArray_DATA(posarr);
+            float* vel = velarr ? (float*)PyArray_DATA(velarr) : NULL;
             Py_BEGIN_ALLOW_THREADS
             pfx->apply(pos, box, vel);
             Py_END_ALLOW_THREADS
@@ -164,8 +164,8 @@ static PyObject* py_apply(PyObject* pySelf, PyObject* args, PyObject* kwds) {
         break;
         case NPY_DOUBLE:
         {
-            double* pos = (double*)PyArray_DATA((PyArrayObject*)posarr);
-            double* vel = velarr ? (double*)PyArray_DATA((PyArrayObject*)velarr) : NULL;
+            double* pos = (double*)PyArray_DATA(posarr);
+            double* vel = velarr ? (double*)PyArray_DATA(velarr) : NULL;
             Py_BEGIN_ALLOW_THREADS
             pfx->apply(pos, box, vel);
             Py_END_ALLOW_THREADS
@@ -207,8 +207,8 @@ static PyObject* py_glue(PyObject *self, PyObject *args, PyObject *kwds) {
                     NULL)))
         return NULL;
 
-    int n = (int)PyArray_DIM((PyArrayObject*)atomarr, 0);
-    pfx->glue(n, (unsigned *)PyArray_DATA((PyArrayObject*)atomarr));
+    int n = (int)PyArray_DIM(atomarr, 0);
+    pfx->glue(n, (unsigned *)PyArray_DATA(atomarr));
     Py_DECREF(atomarr);
 
     Py_INCREF(Py_None);
@@ -255,14 +255,14 @@ static PyObject* py_align(PyObject *self, PyObject *args, PyObject *kwds) {
             return NULL;
         }
 
-        if (PyArray_DIM((PyArrayObject*)coordarr,0)!=PyArray_DIM((PyArrayObject*)atomarr,0) ||
-            PyArray_DIM((PyArrayObject*)coordarr,1)!=3) {
+        if (PyArray_DIM(coordarr,0)!=PyArray_DIM(atomarr,0) ||
+            PyArray_DIM(coordarr,1)!=3) {
             Py_DECREF(atomarr);
             Py_DECREF(coordarr);
             PyErr_Format(PyExc_ValueError, "coords must be len(atoms) x 3");
             return NULL;
         }
-        coords = (const double*)PyArray_DATA((PyArrayObject*)coordarr);
+        coords = (const double*)PyArray_DATA(coordarr);
     }
 
     if (wobj!=Py_None) {
@@ -276,17 +276,17 @@ static PyObject* py_align(PyObject *self, PyObject *args, PyObject *kwds) {
             Py_XDECREF(coordarr);
             return NULL;
         }
-        if (PyArray_DIM((PyArrayObject*)warr,0)!=PyArray_DIM((PyArrayObject*)atomarr,0)) {
+        if (PyArray_DIM(warr,0)!=PyArray_DIM(atomarr,0)) {
             Py_DECREF(atomarr);
             Py_XDECREF(coordarr);
             PyErr_Format(PyExc_ValueError, "weights must be len(atoms)");
             return NULL;
         }
-        weights = (const double *)PyArray_DATA((PyArrayObject*)warr);
+        weights = (const double *)PyArray_DATA(warr);
     }
 
-    unsigned n = (int)PyArray_DIM((PyArrayObject*)atomarr, 0);
-    pfx->align(n, (unsigned *)PyArray_DATA((PyArrayObject*)atomarr), coords, weights);
+    unsigned n = (int)PyArray_DIM(atomarr, 0);
+    pfx->align(n, (unsigned *)PyArray_DATA(atomarr), coords, weights);
 
     Py_DECREF(atomarr);
     Py_XDECREF(coordarr);
@@ -318,19 +318,19 @@ static PyObject* py_rmsd(PyObject *self, PyObject *args, PyObject *kwds) {
         return NULL;
     }
 
-    if (PyArray_DIM((PyArrayObject*)posarr,0)!=pfx->size() ||
-        PyArray_DIM((PyArrayObject*)posarr,1)!=3) {
+    if (PyArray_DIM(posarr,0)!=pfx->size() ||
+        PyArray_DIM(posarr,1)!=3) {
         PyErr_Format(PyExc_ValueError, "pos must be len(atoms) x 3");
         Py_DECREF(posarr);
         return NULL;
     }
     double rmsd=-1;
-    switch (PyArray_TYPE((PyArrayObject*)posarr)) {
+    switch (PyArray_TYPE(posarr)) {
         case NPY_FLOAT:
-            rmsd = pfx->rmsd((const float *)PyArray_DATA((PyArrayObject*)posarr));
+            rmsd = pfx->rmsd((const float *)PyArray_DATA(posarr));
             break;
         case NPY_DOUBLE:
-            rmsd = pfx->rmsd((const double*)PyArray_DATA((PyArrayObject*)posarr));
+            rmsd = pfx->rmsd((const double*)PyArray_DATA(posarr));
             break;
         default:
             PyErr_Format(PyExc_ValueError, "pos must be float or double");
@@ -390,11 +390,11 @@ static PyObject* extract_3x3(PyObject* Aobj) {
                  NULL))) {
         return NULL;
     }
-    if (PyArray_DIM((PyArrayObject*)Aarr,0)!=3 ||
-        PyArray_DIM((PyArrayObject*)Aarr,1)!=3) {
+    if (PyArray_DIM(Aarr,0)!=3 ||
+        PyArray_DIM(Aarr,1)!=3) {
         PyErr_Format(PyExc_ValueError, "Expected 3x3 matrix; got %ldx%ld",
-                PyArray_DIM((PyArrayObject*)Aarr,0),
-                PyArray_DIM((PyArrayObject*)Aarr,1));
+                PyArray_DIM(Aarr,0),
+                PyArray_DIM(Aarr,1));
         Py_DECREF(Aarr);
         return NULL;
     }
@@ -407,13 +407,13 @@ static handle wrap_inverse(object obj) {
     PyObject *Aobj, *Aarr;
     Aobj = obj.ptr();
     if (!(Aarr = extract_3x3(Aobj)))
-        return pybind11::none();
-    const double* src = (const double*)PyArray_DATA((PyArrayObject*)Aarr);
+        return NULL;
+    const double* src = (const double*)PyArray_DATA(Aarr);
     double dst[9];
     desres::msys::pfx::inverse_3x3(dst, src);
     npy_intp dims[2] = {3,3};
     auto Ainv = PyArray_SimpleNew(2, dims, NPY_FLOAT64);
-    memcpy(PyArray_DATA((PyArrayObject*)Ainv), dst, sizeof(dst));
+    memcpy(PyArray_DATA(Ainv), dst, sizeof(dst));
     return Ainv;
 }
 
@@ -430,11 +430,11 @@ static handle wrap_svd(args _args, kwargs kwds) {
     npy_intp vdims[1] = {3};
 
     if (!PyArg_ParseTupleAndKeywords(_args.ptr(), kwds.ptr(), "O", kwlist, &Aobj))
-        return pybind11::none();
+        return NULL;
     if (!(Aarr = extract_3x3(Aobj)))
-        return pybind11::none();
+        return NULL;
     
-    memcpy(u,PyArray_DATA((PyArrayObject*)Aarr), sizeof(u));
+    memcpy(u,PyArray_DATA(Aarr), sizeof(u));
     desres::msys::pfx::svd_3x3(u,w,v);
     Py_DECREF(Aarr);
 
@@ -442,9 +442,9 @@ static handle wrap_svd(args _args, kwargs kwds) {
     U = PyArray_SimpleNew(2,mdims,NPY_FLOAT64);
     W = PyArray_SimpleNew(1,vdims,NPY_FLOAT64);
     V = PyArray_SimpleNew(2,mdims,NPY_FLOAT64);
-    memcpy(PyArray_DATA((PyArrayObject*)U), u, sizeof(u));
-    memcpy(PyArray_DATA((PyArrayObject*)W), w, sizeof(w));
-    memcpy(PyArray_DATA((PyArrayObject*)V), v, sizeof(v));
+    memcpy(PyArray_DATA(U), u, sizeof(u));
+    memcpy(PyArray_DATA(W), w, sizeof(w));
+    memcpy(PyArray_DATA(V), v, sizeof(v));
     PyTuple_SET_ITEM(result,0,U);
     PyTuple_SET_ITEM(result,1,W);
     PyTuple_SET_ITEM(result,2,V);
@@ -463,14 +463,14 @@ handle wrap_aligned_rmsd(args _args, kwargs kwds) {
     PyObject *Xobj, *Yobj, *Wobj=NULL;
     PyObject *Xarr, *Yarr, *Marr, *Warr=NULL;
     if (!PyArg_ParseTupleAndKeywords(_args.ptr(), kwds.ptr(), "OO|O", kwlist, &Xobj, &Yobj, &Wobj))
-        return pybind11::none();
+        return NULL;
     if (!(Xarr = PyArray_FromAny(
                     Xobj,
                     PyArray_DescrFromType(NPY_FLOAT64),
                     2,2,
                     NPY_C_CONTIGUOUS | NPY_ALIGNED | NPY_FORCECAST,
                     NULL)))
-        return pybind11::none();
+        return NULL;
     if (!(Yarr = PyArray_FromAny(
                     Yobj,
                     PyArray_DescrFromType(NPY_FLOAT64),
@@ -478,7 +478,7 @@ handle wrap_aligned_rmsd(args _args, kwargs kwds) {
                     NPY_C_CONTIGUOUS | NPY_ALIGNED | NPY_FORCECAST,
                     NULL))) {
         Py_DECREF(Xarr);
-        return pybind11::none();
+        return NULL;
     }
     if (Wobj && !(Warr = PyArray_FromAny(
                     Wobj,
@@ -488,32 +488,32 @@ handle wrap_aligned_rmsd(args _args, kwargs kwds) {
                     NULL))) {
         Py_DECREF(Xarr);
         Py_DECREF(Yarr);
-        return pybind11::none();
+        return NULL;
     }
-    unsigned n = PyArray_DIM((PyArrayObject*)Xarr,0);
-    if (PyArray_DIM((PyArrayObject*)Xarr,1)!=3 || PyArray_DIM((PyArrayObject*)Yarr,1)!=3 ||
-        n==0 || PyArray_DIM((PyArrayObject*)Yarr,0)!=n) {
+    unsigned n = PyArray_DIM(Xarr,0);
+    if (PyArray_DIM(Xarr,1)!=3 || PyArray_DIM(Yarr,1)!=3 ||
+        n==0 || PyArray_DIM(Yarr,0)!=n) {
         PyErr_Format(PyExc_ValueError, "Require equal sized nx3 matrices");
         Py_DECREF(Xarr);
         Py_DECREF(Yarr);
         Py_XDECREF(Warr);
-        return pybind11::none();
+        return NULL;
     }
-    if (Warr && (PyArray_DIM((PyArrayObject*)Warr,0)!=n)) {
+    if (Warr && (PyArray_DIM(Warr,0)!=n)) {
         PyErr_Format(PyExc_ValueError, "Require weights of same length as X, Y");
         Py_DECREF(Xarr);
         Py_DECREF(Yarr);
         Py_XDECREF(Warr);
-        return pybind11::none();
+        return NULL;
     }
 
     npy_intp dims[2] = {3,3};
     Marr = PyArray_SimpleNew(2,dims,NPY_FLOAT64);
-    const double* X = (double *)PyArray_DATA((PyArrayObject*)Xarr);
-    const double* Y = (double *)PyArray_DATA((PyArrayObject*)Yarr);
-    const double* W = Warr ? (double *)PyArray_DATA((PyArrayObject*)Warr) : (double *)NULL;
+    const double* X = (double *)PyArray_DATA(Xarr);
+    const double* Y = (double *)PyArray_DATA(Yarr);
+    const double* W = Warr ? (double *)PyArray_DATA(Warr) : (double *)NULL;
 
-    double* mat = (double *)PyArray_DATA((PyArrayObject*)Marr);
+    double* mat = (double *)PyArray_DATA(Marr);
     double rmsd = desres::msys::pfx::compute_alignment(n, NULL, X, Y, mat, W);
     Py_DECREF(Xarr);
     Py_DECREF(Yarr);

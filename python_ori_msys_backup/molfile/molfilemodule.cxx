@@ -29,7 +29,7 @@ PyObject **desres::molfile::object_array(int size, PyObject **returned_result) {
     PyObject *result = PyArray_SimpleNew(1, &dims, NPY_OBJECT);
     if (!result) return NULL;
     *returned_result = result;
-    return reinterpret_cast<PyObject**>(PyArray_DATA((PyArrayObject*)result));
+    return reinterpret_cast<PyObject**>(PyArray_DATA(result));
 }
 
 namespace {
@@ -64,9 +64,9 @@ namespace {
                     PyErr_Format(PyExc_ValueError, "array for key %s must be 1d", key.c_str());
                     throw error_already_set();
                 }
-                int npytype = PyArray_TYPE((PyArrayObject*)ptr);
-                const void* data = PyArray_DATA((PyArrayObject*)ptr);
-                unsigned n = PyArray_DIM((PyArrayObject*)ptr,0);
+                int npytype = PyArray_TYPE(ptr);
+                const void* data = PyArray_DATA(ptr);
+                unsigned n = PyArray_DIM(ptr,0);
                 switch (npytype) {
                     case NPY_INT32:
                         keyval.set((const int32_t*)data, n);
@@ -176,27 +176,27 @@ namespace {
                     break;
                 case dtr::Key::TYPE_INT32:
                     arr = PyArray_SimpleNew(1, &dims, NPY_INT32);
-                    val.get((int32_t*)PyArray_DATA((PyArrayObject*)arr)); 
+                    val.get((int32_t*)PyArray_DATA(arr)); 
                     break;
                 case dtr::Key::TYPE_UINT32:
                     arr = PyArray_SimpleNew(1, &dims, NPY_UINT32);
-                    val.get((uint32_t*)PyArray_DATA((PyArrayObject*)arr)); 
+                    val.get((uint32_t*)PyArray_DATA(arr)); 
                     break;
                 case dtr::Key::TYPE_INT64:
                     arr = PyArray_SimpleNew(1, &dims, NPY_INT64);
-                    val.get((int64_t*)PyArray_DATA((PyArrayObject*)arr)); 
+                    val.get((int64_t*)PyArray_DATA(arr)); 
                     break;
                 case dtr::Key::TYPE_UINT64:
                     arr = PyArray_SimpleNew(1, &dims, NPY_UINT64);
-                    val.get((uint64_t*)PyArray_DATA((PyArrayObject*)arr)); 
+                    val.get((uint64_t*)PyArray_DATA(arr)); 
                     break;
                 case dtr::Key::TYPE_FLOAT32:
                     arr = PyArray_SimpleNew(1, &dims, NPY_FLOAT32);
-                    val.get((float*)PyArray_DATA((PyArrayObject*)arr)); 
+                    val.get((float*)PyArray_DATA(arr)); 
                     break;
                 case dtr::Key::TYPE_FLOAT64:
                     arr = PyArray_SimpleNew(1, &dims, NPY_FLOAT64);
-                    val.get((double*)PyArray_DATA((PyArrayObject*)arr)); 
+                    val.get((double*)PyArray_DATA(arr)); 
                     break;
                 case dtr::Key::TYPE_CHAR:
                     arr = py_string_from_string_size(

@@ -11,8 +11,12 @@ the sort used in molecular simulations.  Its main features include:
 
 Msys currently supports Python 3.6+.  
 
-Building Msys
+Building Msys with python 3.10 and numpy 2.2
 -------------
+
+See in INSTALL.md
+
+Old Building Msys                                                                                                                                                                       ---------------------
 
 To build Msys, you'll need at a minimum the following:
 
@@ -112,5 +116,6 @@ The last few lines of `assign.sdf` should specify formal charges on two atoms:
     M  CHG  1  30   1
     M  CHG  1  31  -1
     ...
+
 
 

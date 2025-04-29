@@ -141,7 +141,7 @@ namespace {
     }
 
     void reader_grid_data(Reader const& r, int n, object arr) {
-        r.read_grid(n, (float *)PyArray_DATA((PyArrayObject*)arr.ptr()));
+        r.read_grid(n, (float *)PyArray_DATA(arr.ptr()));
     }
 
     Frame* reader_next(Reader& r) {

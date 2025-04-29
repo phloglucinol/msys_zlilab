@@ -67,7 +67,7 @@ namespace {
                 NPY_ARRAY_C_CONTIGUOUS | NPY_FORCECAST,
                 nullptr);
         if (!arr) throw error_already_set();
-        memcpy(a, PyArray_DATA((PyArrayObject*)arr), 3*sizeof(double));
+        memcpy(a, PyArray_DATA(arr), 3*sizeof(double));
         Py_DECREF(arr);
     }
 

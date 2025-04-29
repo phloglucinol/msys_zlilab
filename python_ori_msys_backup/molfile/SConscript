@@ -1,0 +1,29 @@
+Import("msysenv")
+import sys
+
+env = msysenv.Clone()
+
+cxx_flags = "-Wno-unused-local-typedefs"
+
+env.Append(CXXFLAGS=cxx_flags, LIBS=["msys"])
+
+env.Append(CCFLAGS="-Wno-unused-function".split())
+if env["PLATFORM"] == "darwin":
+    env.Append(CCFLAGS="-Wno-error")
+elif sys.platform.startswith("linux"):
+    env.Append(CCFLAGS="-Wno-cpp")
+
+srcs = Split(
+    """
+molfilemodule.cxx
+plugin.cxx
+reader.cxx
+atom.cxx
+frame.cxx
+writer.cxx
+"""
+)
+
+env.AddPythonExtension("_molfile", srcs, prefix="msys/molfile")
+env.AddPythonExtension("findframe", "findframemodule.cxx", prefix="msys/molfile")
+env.AddPythonModule("__init__.py", prefix="msys/molfile")

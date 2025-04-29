@@ -1,0 +1,48 @@
+Import("msysenv")
+import sys, os
+
+env = msysenv.Clone()
+
+is_linux = sys.platform.startswith("linux")
+
+env.Append(
+    CPPPATH=["../src"],
+    CXXFLAGS="-Wno-unused-local-typedefs",
+    LIBS=["msys", "msys-core"],
+)
+
+if is_linux:
+    env.Append(CCFLAGS="-Wno-cpp")
+else:
+    # MacOS
+    env.Append(CCFLAGS="-Wno-error -Wno-return-std-move")
+if env.get("MSYS_WITHOUT_INCHI"):
+    env.Append(CPPDEFINES="MSYS_WITHOUT_INCHI")
+
+pymodfiles = """
+pymod.cxx
+analyze.cxx
+annotated_system.cxx
+chain.cxx
+ff.cxx
+graph.cxx
+inchi.cxx
+io.cxx
+override.cxx
+param.cxx
+system.cxx
+spatial_hash.cxx
+term.cxx
+""".split()
+
+pyext = env.AddPythonExtension("_msys", pymodfiles, prefix="msys")
+env.AddPythonModule("__init__.py", prefix="msys")
+env.AddPythonModule("atomsel.py", prefix="msys")
+env.AddPythonModule("ff.py", prefix="msys")
+
+pfxenv = env.Clone()
+pfxenv.Append(CXXFLAGS="-fno-strict-aliasing")
+pfxenv.AddPythonExtension("pfx", "pfx.cxx", prefix="msys")
+
+env.AddHeaders(["capsule.hxx"], prefix="msys/python")
+env.SConscript("molfile/SConscript")
